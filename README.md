@@ -40,15 +40,18 @@
    ```bash
    git clone https://github.com/yourusername/ai-trading-predictor.git
    cd ai-trading-predictor
-Install dependencies
+
+2. **Install dependencies**
 
 bash
 pip install -r requirements.txt
+
 Or install individually:
 
 bash
 pip install streamlit plotly pandas numpy scikit-learn xgboost yfinance
-Run the application
+
+3. **Run the application**
 
 bash
 # Web Interface (Recommended)

@@ -82,7 +82,7 @@ View AI predictions, charts, and trading signals
   # Launch web interface
   python ai_trader_fixed.py --web
 
-# Example Commands
+**# Command Line Interface**
   ```bash
   # Predict Apple stock for next 7 days
   python ai_trader_fixed.py AAPL

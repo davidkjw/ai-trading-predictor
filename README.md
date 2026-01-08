@@ -59,9 +59,9 @@
    # Command Line Interface
    python ai_trader_fixed.py AAPL --days 7
 
-# 🚀 Usage Guide
+## 🚀 Usage Guide
 
-# Web Interface (Recommended)
+## Web Interface (Recommended)
 Launch the app: streamlit run ai_trader_fixed.py
 
 Enter a symbol (e.g., AAPL, BTC-USD, TSLA)
@@ -70,7 +70,7 @@ Click "🚀 PREDICT NOW"
 
 View AI predictions, charts, and trading signals
 
-# Command Line Interface
+## Command Line Interface
 
   ```bash
   # Single prediction
@@ -94,6 +94,7 @@ View AI predictions, charts, and trading signals
 streamlit run ai_trader_fixed.py
 
 # 📊 Supported Symbols
+
 Stocks
 AAPL - Apple Inc.
 

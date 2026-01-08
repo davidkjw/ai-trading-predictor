@@ -56,8 +56,9 @@
    # Web Interface (Recommended)
    streamlit run ai_trader_fixed.py
 
-# Command Line Interface
-python ai_trader_fixed.py AAPL --days 7
+   # Command Line Interface
+   python ai_trader_fixed.py AAPL --days 7
+
 🚀 Usage Guide
 Web Interface (Recommended)
 Launch the app: streamlit run ai_trader_fixed.py

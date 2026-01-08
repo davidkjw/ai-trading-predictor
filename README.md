@@ -185,17 +185,17 @@ https://via.placeholder.com/1000x600/764ba2/ffffff?text=Dashboard+with+Charts+an
 text
 ┌─────────────────────────────────────────────┐
 │            Streamlit Frontend               │
-│  • User Interface                          │
-│  • Interactive Charts                      │
-│  • Real-time Updates                      │
+│  • User Interface                           │
+│  • Interactive Charts                       │
+│  • Real-time Updates                        │
 └────────────────┬────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────┐
 │          AI Trader Engine                   │
-│  • Data Collection                         │
-│  • Feature Engineering                     │
-│  • ML Model Training/Prediction            │
-│  • Signal Generation                       │
+│  • Data Collection                          │
+│  • Feature Engineering                      │
+│  • ML Model Training/Prediction             │
+│  • Signal Generation                        │
 └────────────────┬────────────────────────────┘
                  │
         ┌────────▼────────┐

@@ -196,6 +196,7 @@ text
         │  • Alpha Vantage│
         │  • Synthetic    │
         └─────────────────┘
+
 🔬 Technical Implementation
 Machine Learning Pipeline
 Data Collection: Fetch historical price data
@@ -242,6 +243,7 @@ ai-trader/
 └── docs/                   # Documentation
     ├── API.md
     └── deployment.md
+
 ⚙️ Configuration
 Environment Variables
 bash
@@ -251,8 +253,8 @@ export ALPHA_VANTAGE_KEY="your_api_key_here"
 # Optional: Set default model parameters
 export DEFAULT_FORECAST_DAYS=7
 export MIN_TRAINING_SAMPLES=100
-Custom Settings in Code
-python
+Custom Settings in Code python
+
 # In ai_trader_fixed.py, you can modify:
 MODEL_PARAMS = {
     'n_estimators': 100,      # Number of trees
@@ -266,9 +268,12 @@ FEATURE_SETTINGS = {
     'bb_period': 20,          # Bollinger Bands period
     'ma_windows': [5,10,20,50] # Moving average windows
 }
+
 🚢 Deployment
 Local Development
+
 bash
+
 # 1. Create virtual environment
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate

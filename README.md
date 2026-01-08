@@ -45,16 +45,16 @@
    ```bash
    pip install -r requirements.txt
 
-Or install individually:
+   Or install individually:
 
-bash
-pip install streamlit plotly pandas numpy scikit-learn xgboost yfinance
+   ```bash
+   pip install streamlit plotly pandas numpy scikit-learn xgboost yfinance
 
 3. **Run the application**
 
-bash
+   ```bash
 # Web Interface (Recommended)
-streamlit run ai_trader_fixed.py
+   streamlit run ai_trader_fixed.py
 
 # Command Line Interface
 python ai_trader_fixed.py AAPL --days 7

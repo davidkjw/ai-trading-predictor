@@ -2,8 +2,6 @@
 
 A privacy-first desktop application that allows you to chat with your PDF documents using local AI. No cloud services, no API keys, no data leaving your computer.
 
-![Application Demo](https://via.placeholder.com/800x450/667eca/ffffff?text=RAG+PDF+Assistant+Demo)
-
 ## ✨ Key Features
 
 - **🔒 100% Private** - All processing happens locally on your machine

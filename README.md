@@ -53,7 +53,7 @@
 3. **Run the application**
 
    ```bash
-# Web Interface (Recommended)
+   # Web Interface (Recommended)
    streamlit run ai_trader_fixed.py
 
 # Command Line Interface

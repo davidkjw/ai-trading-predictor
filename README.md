@@ -7,8 +7,6 @@
 
 **AI-powered stock and cryptocurrency price prediction system that works even when Yahoo Finance is blocked.**
 
-![AI Trader Demo](https://via.placeholder.com/800x450/667eea/ffffff?text=AI+Trading+Predictor+Dashboard)
-
 ## ✨ Key Features
 
 - **🤖 Intelligent Predictions**: Machine learning models (XGBoost) forecast prices with 70-85% accuracy

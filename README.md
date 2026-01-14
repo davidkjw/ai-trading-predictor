@@ -1,4 +1,4 @@
-# 🚀 AI Trading Predictor - Fixed Version
+# 🚀 AI Trading Predictor
 
 [![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-2.0%2B-green)](https://xgboost.readthedocs.io/)

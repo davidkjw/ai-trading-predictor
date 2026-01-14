@@ -1,5 +1,5 @@
 """
-🚀 AI TRADER - FIXED VERSION
+🚀 AI TRADER
 Works even when Yahoo Finance is blocked
 """
 

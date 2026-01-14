@@ -17,6 +17,17 @@
 - **⚡ Fast Performance**: Predictions in under 5 seconds
 - **🔧 Flexible Deployment**: Works as CLI tool or web app
 
+## 🔍 How It Works
+- **Data Ingestion**: The system pulls 1 year of historical OHLCV (Open, High, Low, Close, Volume) data.
+- **Feature Engineering**: It transforms raw prices into mathematical signals (e.g., $RSI = 100 - [100 / (1 + RS)]$).
+- **Training**: The XGBoost model trains on the first 80% of the data, learning the relationship between indicators and the price $N$ days in the future.
+- **Evaluation**: The model is tested on the remaining 20% to calculate Mean Absolute Error (MAE) and confidence scores.
+- **Signal Generation**:
+  - **Strong Buy**: >5% expected gain.
+  - **Moderate Buy**: 2-5% expected gain.
+  - **Hold**: -2% to 2% movement.
+  - **Sell/Strong Sell**: Expected declines beyond -2% and -5%.
+
 ## 🎯 Who Should Use This?
 
 - **Traders** looking for AI-assisted decision making

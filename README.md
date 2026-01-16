@@ -37,7 +37,7 @@ AI Asset Price Predictor is a professional trading assistant that uses machine l
 
 ## 🚀 Quick Installation
 
-### Option 1: One-Click Run (Recommended)
+### One-Click Run 
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/ai-asset-predictor.git

@@ -1,4 +1,4 @@
-# 🤖 AI Asset Price Predictor
+# 🤖 AI Trading Predictor
 
 ![Python](https://img.shields.io/badge/Python-3.8%2B-blue)
 ![Streamlit](https://img.shields.io/badge/Streamlit-1.22%2B-red)
@@ -8,6 +8,7 @@
 
 **Predict stock & cryptocurrency prices with machine learning and comprehensive technical analysis**
 
+---
 
 ## 🎯 What This Does
 
@@ -19,6 +20,7 @@ AI Asset Price Predictor is a professional trading assistant that uses machine l
 - **🛡️ Risk Management** - Complete trading plans with stop-loss & take-profit
 - **📈 Real-time Data** - Multiple API sources with automatic fallback
 
+---
 
 ## ⚙️ How It Works
 
@@ -58,6 +60,7 @@ The application is designed for **high availability**. In financial applications
 | **Interactive Visuals** | Multi-pane Plotly subplots that mimic professional terminals (Bloomberg/TradingView style). |
 | **State Management** | Uses `lru_cache` to optimize performance and prevent redundant heavy computations. |
 
+---
 
 ## ✨ Key Features
 
@@ -73,6 +76,8 @@ The application is designed for **high availability**. In financial applications
 | **No Setup Required** | Works immediately with synthetic data | ✅ |
 | **Free Forever** | No subscriptions, completely open-source | ✅ |
 
+---
+
 ## 🛠️ Tech Stack
 
 The platform is built using a modern Python-based stack designed for data science and high-performance financial analysis.
@@ -86,18 +91,18 @@ The platform is built using a modern Python-based stack designed for data scienc
 | **Data Handling** | ![Pandas](https://img.shields.io/badge/Pandas-150458?style=flat&logo=pandas&logoColor=white) ![NumPy](https://img.shields.io/badge/NumPy-013243?style=flat&logo=numpy&logoColor=white) | Heavy-duty time-series analysis and technical indicator calculation. |
 | **Storage** | ![Parquet](https://img.shields.io/badge/Apache_Parquet-black?style=flat) | Fast, column-oriented caching to minimize disk I/O and latency. |
 
+---
+
 ## 🚀 Quick Installation
 
-### One-Click Run 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/ai-asset-predictor.git
-cd ai-asset-predictor
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the app
-streamlit run ai_trader_fixed.py
+#### One-Click Run 
+#### Clone the repository
+    git clone https://github.com/yourusername/ai-asset-predictor.git
+    cd ai-asset-predictor
+#### Install dependencies
+    pip install -r requirements.txt
+#### Run the app
+    streamlit run ai_trader_fixed.py
 
 
+## ⭐ Love this tool? Give it a star on GitHub! ⭐

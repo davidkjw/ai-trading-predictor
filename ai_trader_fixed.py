@@ -30,6 +30,16 @@ from typing import Optional, Dict, Tuple
 from functools import lru_cache
 import shutil
 
+from trader_core import (
+    calculate_risk_score as _core_risk_score,
+    calculate_technical_indicators as _core_indicators,
+    create_recommendation as _core_recommendation,
+    create_synthetic_data as _core_synthetic_data,
+    generate_ai_recommendation as _core_recommendation_pipeline,
+    generate_fallback_recommendation as _core_fallback,
+    predict_price as _core_predict_price,
+)
+
 # Page configuration
 st.set_page_config(
     page_title="AI Trader Pro - Fixed",
@@ -548,45 +558,9 @@ class RealDataFetcher:
         return None
     
     def _create_synthetic_data(self, symbol: str, days: int = 365) -> pd.DataFrame:
-        """Create realistic synthetic data"""
+        """Create realistic synthetic data (delegates to trader_core)."""
         print(f"🎭 Creating synthetic data for {symbol}")
-        
-        dates = pd.date_range(end=datetime.now(), periods=days, freq='D')
-        symbol_upper = symbol.upper()
-        
-        # Base settings
-        if any(crypto in symbol_upper for crypto in ['BTC', 'ETH', 'XRP', 'ADA', 'SOL']):
-            base_price = np.random.choice([20000, 30000, 40000, 50000])
-            volatility = 0.04
-            trend = 0.0003
-        elif any(stock in symbol_upper for stock in ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA']):
-            base_price = np.random.choice([100, 150, 200, 300, 400])
-            volatility = 0.02
-            trend = 0.0001
-        else:
-            base_price = 100
-            volatility = 0.015
-            trend = 0.00005
-        
-        # Generate price series
-        np.random.seed(hash(symbol) % 10000)
-        returns = np.random.normal(trend, volatility, days)
-        prices = base_price * np.cumprod(1 + returns)
-        
-        # Create OHLC data
-        df = pd.DataFrame({
-            'Open': prices * (1 + np.random.uniform(-0.01, 0.01, days)),
-            'High': prices * (1 + np.abs(np.random.uniform(0.01, 0.03, days))),
-            'Low': prices * (1 - np.abs(np.random.uniform(0.01, 0.03, days))),
-            'Close': prices,
-            'Volume': np.random.lognormal(14, 1, days) * (1 + np.abs(returns) * 10)
-        }, index=dates)
-        
-        # Ensure High >= Open/Close >= Low
-        df['High'] = df[['Open', 'High', 'Close']].max(axis=1)
-        df['Low'] = df[['Open', 'Low', 'Close']].min(axis=1)
-        
-        return df
+        return _core_synthetic_data(symbol, days)
 
 # ============================================================================
 # AI TRADER ENGINE
@@ -600,285 +574,31 @@ class AITraderEngine:
         self.models = {}
     
     def calculate_technical_indicators(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Calculate technical indicators"""
-        data = df.copy()
-        price_col = 'Close'
-        
-        # Basic returns
-        data['returns'] = data[price_col].pct_change()
-        
-        # Moving Averages
-        for window in [5, 10, 20, 50, 200]:
-            if len(data) >= window:
-                data[f'MA_{window}'] = data[price_col].rolling(window).mean()
-        
-        # RSI
-        delta = data[price_col].diff()
-        gain = (delta.where(delta > 0, 0)).rolling(14).mean()
-        loss = (-delta.where(delta < 0, 0)).rolling(14).mean()
-        rs = gain / (loss + 1e-10)
-        data['RSI'] = 100 - (100 / (1 + rs))
-        
-        # MACD
-        exp1 = data[price_col].ewm(span=12, adjust=False).mean()
-        exp2 = data[price_col].ewm(span=26, adjust=False).mean()
-        data['MACD'] = exp1 - exp2
-        data['MACD_signal'] = data['MACD'].ewm(span=9, adjust=False).mean()
-        
-        # Bollinger Bands
-        if len(data) >= 20:
-            data['BB_middle'] = data[price_col].rolling(20).mean()
-            bb_std = data[price_col].rolling(20).std()
-            data['BB_upper'] = data['BB_middle'] + (bb_std * 2)
-            data['BB_lower'] = data['BB_middle'] - (bb_std * 2)
-        
-        # Volume
-        if 'Volume' in data.columns:
-            data['volume_MA'] = data['Volume'].rolling(20).mean()
-            data['volume_ratio'] = data['Volume'] / data['volume_MA']
-        
-        # Drop NaN
-        data = data.dropna()
-        
-        return data
-    
+        """Calculate technical indicators (delegates to trader_core)."""
+        return _core_indicators(df)
+
     def generate_ai_recommendation(self, df: pd.DataFrame, forecast_days: int = 7) -> Dict:
-        """Generate AI trading recommendation"""
-        
-        if len(df) < 50:
-            return self._generate_fallback_recommendation(df)
-        
-        try:
-            # Calculate features
-            features_df = self.calculate_technical_indicators(df)
-            
-            # Get latest values
-            latest = features_df.iloc[-1]
-            current_price = latest['Close']
-            
-            # Make prediction
-            predicted_price = self._predict_price(features_df, forecast_days)
-            pct_change = ((predicted_price - current_price) / current_price) * 100
-            
-            # Analyze indicators
-            rsi = latest.get('RSI', 50)
-            ma_20 = latest.get('MA_20', current_price)
-            ma_50 = latest.get('MA_50', current_price)
-            
-            # Generate signal
-            if pct_change > 8 and rsi < 70 and current_price > ma_20:
-                signal = "🟢 STRONG BUY"
-                signal_color = "green"
-                confidence = "HIGH"
-            elif pct_change > 3 and rsi < 75:
-                signal = "🟡 MODERATE BUY"
-                signal_color = "yellow"
-                confidence = "MEDIUM"
-            elif pct_change < -8 and rsi > 30:
-                signal = "🔴 STRONG SELL"
-                signal_color = "red"
-                confidence = "HIGH"
-            elif pct_change < -3 and rsi > 25:
-                signal = "🟠 MODERATE SELL"
-                signal_color = "orange"
-                confidence = "MEDIUM"
-            else:
-                signal = "⚪ HOLD"
-                signal_color = "gray"
-                confidence = "LOW"
-            
-            # Risk score
-            risk_score = self._calculate_risk_score(latest, pct_change)
-            
-            # Create recommendation
-            recommendation = self._create_recommendation(
-                signal, current_price, predicted_price, 
-                pct_change, forecast_days, risk_score
-            )
-            
-            return {
-                'current_price': current_price,
-                'predicted_price': predicted_price,
-                'pct_change': pct_change,
-                'signal': signal,
-                'signal_color': signal_color,
-                'confidence': confidence,
-                'risk_score': risk_score,
-                'recommendation': recommendation,
-                'indicators': {
-                    'RSI': round(rsi, 2),
-                    'MA_20': round(ma_20, 2),
-                    'MA_50': round(ma_50, 2),
-                    'MACD': round(latest.get('MACD', 0), 3)
-                },
-                'is_synthetic': df.get('IsSynthetic', True).iloc[-1] if 'IsSynthetic' in df.columns else True
-            }
-            
-        except Exception as e:
-            print(f"AI recommendation error: {e}")
-            return self._generate_fallback_recommendation(df)
-    
+        """Generate AI trading recommendation (delegates to trader_core)."""
+        return _core_recommendation_pipeline(df, forecast_days)
+
     def _predict_price(self, df: pd.DataFrame, forecast_days: int) -> float:
-        """Predict future price"""
-        try:
-            # Simple weighted prediction
-            current_price = df['Close'].iloc[-1]
-            
-            # Method 1: Trend extrapolation
-            last_10 = df['Close'].iloc[-10:].values
-            if len(last_10) >= 2:
-                x = np.arange(len(last_10))
-                coeffs = np.polyfit(x, last_10, 1)
-                trend_pred = np.polyval(coeffs, len(last_10) + forecast_days)
-            else:
-                trend_pred = current_price * 1.02
-            
-            # Method 2: Moving average projection
-            ma_20 = df['MA_20'].iloc[-1] if 'MA_20' in df.columns else current_price
-            ma_projection = ma_20 * 1.01
-            
-            # Weighted average
-            weights = [0.6, 0.4]  # Trend, MA
-            predictions = [trend_pred, ma_projection]
-            
-            return np.average(predictions, weights=weights)
-            
-        except:
-            return df['Close'].iloc[-1] * 1.02
-    
+        """Predict future price (delegates to trader_core)."""
+        return _core_predict_price(df, forecast_days)
+
     def _calculate_risk_score(self, latest: pd.Series, pct_change: float) -> float:
-        """Calculate risk score (0-100)"""
-        score = 50  # Base
-        
-        # RSI adjustment
-        rsi = latest.get('RSI', 50)
-        if rsi > 70:
-            score += 20
-        elif rsi < 30:
-            score -= 10
-        
-        # Volatility adjustment (simplified)
-        if abs(pct_change) > 10:
-            score += 15
-        elif abs(pct_change) > 5:
-            score += 5
-        
-        # Ensure within bounds
-        return min(max(score, 0), 100)
-    
-    def _create_recommendation(self, signal: str, current_price: float, 
+        """Calculate risk score (delegates to trader_core)."""
+        return _core_risk_score(latest, pct_change)
+
+    def _create_recommendation(self, signal: str, current_price: float,
                               predicted_price: float, pct_change: float,
                               forecast_days: int, risk_score: float) -> Dict:
-        """Create trading recommendation"""
-        
-        # Entry/Exit levels
-        if "BUY" in signal:
-            entry_price = current_price
-            stop_loss = current_price * 0.95
-            take_profit = predicted_price
-            position_size = "70-80% of capital"
-        elif "SELL" in signal:
-            entry_price = current_price
-            stop_loss = current_price * 1.05
-            take_profit = predicted_price
-            position_size = "50-60% of capital"
-        else:
-            entry_price = "N/A"
-            stop_loss = "N/A"
-            take_profit = "N/A"
-            position_size = "Maintain current"
-        
-        # Risk/Reward
-        risk_reward = abs((take_profit - entry_price) / (entry_price - stop_loss)) if isinstance(take_profit, (int, float)) else 0
-        
-        # Time horizon
-        time_horizon = "Short-term" if forecast_days <= 7 else "Medium-term"
-        
-        # Key reasons
-        reasons = []
-        if pct_change > 5:
-            reasons.append(f"Strong upside potential ({pct_change:.1f}%)")
-        if "BUY" in signal:
-            reasons.append("Bullish technical setup")
-        if "SELL" in signal:
-            reasons.append("Bearish market conditions")
-        
-        if not reasons:
-            reasons = ["Market appears neutral", "Wait for clearer signals"]
-        
-        # Suggested actions
-        if "STRONG BUY" in signal:
-            actions = [
-                "Enter long position",
-                "Set 5% stop-loss",
-                "Target profit at predicted price",
-                "Consider adding on dips"
-            ]
-        elif "MODERATE BUY" in signal:
-            actions = [
-                "Enter partial position",
-                "Use tighter 3-4% stop-loss",
-                "Take partial profits",
-                "Wait for confirmation"
-            ]
-        elif "STRONG SELL" in signal:
-            actions = [
-                "Consider short position",
-                "Set 5% stop-loss",
-                "Target support levels",
-                "Consider put options"
-            ]
-        elif "MODERATE SELL" in signal:
-            actions = [
-                "Reduce long exposure",
-                "Set breakeven stop",
-                "Take partial profits",
-                "Wait for better entry"
-            ]
-        else:
-            actions = [
-                "Hold existing positions",
-                "Wait for market direction",
-                "Dollar-cost average if long-term",
-                "Monitor key levels"
-            ]
-        
-        return {
-            'entry_price': entry_price,
-            'stop_loss': stop_loss,
-            'take_profit': take_profit,
-            'risk_reward_ratio': round(risk_reward, 2) if risk_reward > 0 else "N/A",
-            'position_size': position_size,
-            'time_horizon': time_horizon,
-            'key_reasons': reasons,
-            'suggested_actions': actions
-        }
-    
+        """Create trading recommendation (delegates to trader_core)."""
+        return _core_recommendation(signal, current_price, predicted_price,
+                                    pct_change, forecast_days, risk_score)
+
     def _generate_fallback_recommendation(self, df: pd.DataFrame) -> Dict:
-        """Fallback recommendation"""
-        current_price = df['Close'].iloc[-1] if len(df) > 0 else 100
-        
-        return {
-            'current_price': current_price,
-            'predicted_price': current_price * 1.02,
-            'pct_change': 2.0,
-            'signal': "⚪ HOLD",
-            'signal_color': "gray",
-            'confidence': "LOW",
-            'risk_score': 50,
-            'recommendation': {
-                'entry_price': "N/A",
-                'stop_loss': "N/A",
-                'take_profit': "N/A",
-                'risk_reward_ratio': "N/A",
-                'position_size': "Wait for signals",
-                'time_horizon': "Short-term",
-                'key_reasons': ["Insufficient data"],
-                'suggested_actions': ["Wait for more data"]
-            },
-            'indicators': {},
-            'is_synthetic': True
-        }
+        """Fallback recommendation (delegates to trader_core)."""
+        return _core_fallback(df)
 
 # ============================================================================
 # STREAMLIT APP

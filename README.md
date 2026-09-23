@@ -93,16 +93,49 @@ The platform is built using a modern Python-based stack designed for data scienc
 
 ---
 
+## 📁 Project Structure
+
+The project is split into a **testable analytics core** and a **thin UI layer**, so the trading logic can be unit-tested in CI without a browser, API keys, or network access.
+
+```
+├── ai_trader_fixed.py        # Streamlit UI + data fetching (RealDataFetcher)
+├── trader_core.py            # Pure analytics: indicators, prediction, signals, risk
+├── conftest.py               # Pytest bootstrap (makes repo root importable)
+├── requirements.txt          # Dependencies (pinned with >= ranges)
+├── tests/
+│   └── test_trader_core.py   # 23 unit tests for the analytics core
+└── .github/workflows/
+    └── test.yml              # CI: runs the pytest suite on every push/PR
+```
+
+**Why the split:** `ai_trader_fixed.py` used to hold all decision-making logic inline. It now *delegates* to `trader_core.py`, which depends only on `pandas` + `numpy`. That's what makes the indicators, prediction, risk scoring, and signal mapping verifiable in CI.
+
+## 🧪 Testing
+
+The analytics core has a unit-test suite covering indicators (RSI bounds, Bollinger ordering, moving averages), price prediction, risk scoring, signal mapping, and the full recommendation pipeline.
+
+```bash
+pip install -r requirements.txt
+pytest tests -v
+```
+
+CI runs this suite automatically on every push and pull request.
+
+---
+
 ## 🚀 Quick Installation
 
-#### One-Click Run 
-#### Clone the repository
-    git clone https://github.com/yourusername/ai-asset-predictor.git
-    cd ai-asset-predictor
-#### Install dependencies
-    pip install -r requirements.txt
-#### Run the app
-    streamlit run ai_trader_fixed.py
+```bash
+# Clone the repository
+git clone https://github.com/davidkjw/ai-trading-predictor.git
+cd ai-trading-predictor
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run the app
+streamlit run ai_trader_fixed.py
+```
 
 
 ## ⭐ Love this tool? Give it a star on GitHub! ⭐
